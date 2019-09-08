@@ -18,7 +18,7 @@ HunterGate(
   SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
 )
 
-project(Json)
+project(Cache)
 string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
@@ -26,28 +26,17 @@ string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
 
-add_library(
-  ${PROJECT_NAME}
-  STATIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-  sources/Json.cpp
-)
-
 add_executable(
-  tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+  ${PROJECT_NAME}
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/Cli.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/Experiment.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
 )
 
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-
-target_include_directories(
-  tests
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_link_libraries(tests gtest gtest_main ${PROJECT_NAME})
 
 enable_testing()
 add_test(NAME unit_tests COMMAND tests)
