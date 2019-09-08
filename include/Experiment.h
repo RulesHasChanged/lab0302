@@ -20,11 +20,12 @@ private:
 struct Experiment
 {
     using BufferPtr = std::shared_ptr<uint8_t[]>;
+    using WalkFunctionType = std::function<uint8_t(BufferPtr, size_t)>;
 
     size_t bufferSize;
     size_t duration;
 
-    static Experiment doExperiment(size_t bufferSize, const std::function<void(BufferPtr, size_t)> &walkFunction);
+    static Experiment doExperiment(size_t bufferSize, const WalkFunctionType &walkFunction);
 
     static size_t iterationAmount;
 
@@ -47,11 +48,11 @@ struct Investigation
 
     static Investigation doInvestigation(Direction direction, const std::vector<size_t>& bufferSizes);
 
-    static void walkForward(const Experiment::BufferPtr &buffer, size_t size);
-    static void walkBackward(const Experiment::BufferPtr & buffer, size_t size);
-    static void walkRandom(const Experiment::BufferPtr & buffer, size_t size);
+    static uint8_t walkForward(const Experiment::BufferPtr &buffer, size_t size);
+    static uint8_t walkBackward(const Experiment::BufferPtr & buffer, size_t size);
+    static uint8_t walkRandom(const Experiment::BufferPtr & buffer, size_t size);
 
-    static std::function<void(Experiment::BufferPtr, size_t)> getDirectionFunction(Direction direction);
+    static Experiment::WalkFunctionType getDirectionFunction(Direction direction);
 };
 
 struct ExperimentData
@@ -61,7 +62,7 @@ struct ExperimentData
 
 struct ExperimentInitData
 {
-    static ExperimentInitData getExperimentData(const class HardwareData &hardware);
+    static ExperimentInitData getExperimentData(const struct HardwareData &hardware);
 
     std::vector<size_t> bufferSizes;
 };

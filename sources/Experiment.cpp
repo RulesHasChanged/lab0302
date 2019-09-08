@@ -8,14 +8,14 @@
 
 uint8_t Random::generateByte() const
 {
-    std::uniform_int_distribution<> uint(0, 128);
-    return uint(generator);
+    std::uniform_int_distribution<> converter(0, 128);
+    return converter(generator);
 }
 
 size_t Random::generateSize(size_t end) const
 {
-    std::uniform_int_distribution<> uint(0, end);
-    return uint(generator);
+    std::uniform_int_distribution<> converter(0, end);
+    return converter(generator);
 }
 
 std::mt19937 Random::generator{std::random_device{}()};
@@ -25,14 +25,14 @@ Random::Random()
     Random::generator = std::mt19937{std::random_device{}()};
 }
 
-Experiment Experiment::doExperiment(size_t bufferSize, const std::function<void(BufferPtr, size_t)> &walkFunction)
+Experiment Experiment::doExperiment(size_t bufferSize, const Experiment::WalkFunctionType &walkFunction)
 {
     std::cout << "Experiment. Size: " << bufferSize << std::endl;
 
     auto buffer = createFilledBuffer(bufferSize);       // Инициализация
 
     // Прогрев кэша
-    uint8_t value;
+    uint8_t value = 0;
     for (size_t i = 0; i < bufferSize; i++) {
         value = buffer[i];
     }
@@ -43,6 +43,8 @@ Experiment Experiment::doExperiment(size_t bufferSize, const std::function<void(
         walkFunction(buffer, bufferSize);
     }
     auto stopTime = std::chrono::high_resolution_clock::now();
+
+    bufferSize -= value;        // Remove unused variable warning
 
     // Возврат результата
     return {
@@ -85,33 +87,39 @@ Investigation Investigation::doInvestigation(Direction direction, const std::vec
     };
 }
 
-void Investigation::walkForward(const Experiment::BufferPtr &buffer, size_t size)
+uint8_t Investigation::walkForward(const Experiment::BufferPtr &buffer, size_t size)
 {
-    uint8_t value;
+    uint8_t value = 0;
     for (size_t i = 0; i < size; i++) {
         value = buffer[i];
     }
+
+    return value;
 }
 
-void Investigation::walkBackward(const Experiment::BufferPtr &buffer, size_t size)
+uint8_t Investigation::walkBackward(const Experiment::BufferPtr &buffer, size_t size)
 {
-    uint8_t value;
+    uint8_t value = 0;
     for (size_t i = 0; i < size; i++) {
         value = buffer[size - i - 1];
     }
+
+    return value;
 }
 
-void Investigation::walkRandom(const Experiment::BufferPtr &buffer, size_t size)
+uint8_t Investigation::walkRandom(const Experiment::BufferPtr &buffer, size_t size)
 {
     class Random random;
 
-    uint8_t value;
+    uint8_t value = 0;
     for (size_t i = 0; i < size; i++) {
         value = buffer[random.generateSize(size)];
     }
+
+    return value;
 }
 
-std::function<void(Experiment::BufferPtr, size_t)> Investigation::getDirectionFunction(Direction direction)
+Experiment::WalkFunctionType Investigation::getDirectionFunction(Direction direction)
 {
     if (direction == Forward) {
         return &Investigation::walkForward;

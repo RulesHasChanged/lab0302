@@ -100,11 +100,11 @@ std::string experimentDataToHtmlString(const ExperimentData &data)
                   title: 'CPU cache',
                 },
                 hAxis: {
-                  title: 'Time, microseconds',
-                  logScale: true
+                  title: 'Buffer size, KiB',
+                  logScale: false
                 },
                 vAxis: {
-                  title: 'Buffer size, KiB',
+                  title: 'Time, microseconds',
                   logScale: false
                 },
                 width: 900,
