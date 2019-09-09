@@ -30,7 +30,7 @@ std::string experimentDataToYamlString(const ExperimentData &data)
             result += "      number: " + std::to_string(i) + "\n";
             result += "      input_data:\n        buffer_size: \"" + std::to_string(experiment.bufferSize) + " KiB\"\n";
             result +=
-                "      results:\n        duration: \"" + std::to_string(experiment.duration) + " microseconds\"\n";
+                "      results:\n        duration: \"" + std::to_string(experiment.duration) + " milliseconds\"\n";
         }
         result += "\n";
     }
@@ -104,7 +104,7 @@ std::string experimentDataToHtmlString(const ExperimentData &data)
                   logScale: false
                 },
                 vAxis: {
-                  title: 'Time, microseconds',
+                  title: 'Time, milliseconds',
                   logScale: false
                 },
                 explorer: {

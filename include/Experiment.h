@@ -37,8 +37,9 @@ struct Investigation
 
 struct Experiment
 {
-    using BufferPtr = std::shared_ptr<uint8_t[]>;
-    using WalkFunctionType = std::function<uint8_t(BufferPtr, size_t)>;
+    using AtomicType = uint64_t;
+    using BufferPtr = std::shared_ptr<AtomicType[]>;
+    using WalkFunctionType = std::function<AtomicType(BufferPtr, size_t)>;
 
     size_t bufferSize;
     size_t duration;
@@ -46,6 +47,8 @@ struct Experiment
     static Experiment doExperiment(size_t bufferSize, Investigation::Direction direction);
 
     static size_t iterationAmount;
+    static size_t kibToSize(size_t kib);
+    static size_t sizeToKib(size_t size);
 
 private:
     static BufferPtr createFilledBuffer(size_t size);

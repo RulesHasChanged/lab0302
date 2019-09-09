@@ -57,7 +57,9 @@ Random::Random()
 
 Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction direction)
 {
-    std::cout << "Experiment. Size: " << bufferSize << std::endl;
+    std::cout << "Experiment. Size (KiB): " << bufferSize
+              << ". Size (array size): " << kibToSize(bufferSize) << std::endl;
+    bufferSize = kibToSize(bufferSize);
 
     // Инициализация
     class Random random;
@@ -100,9 +102,9 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
 
     // Возврат результата
     return {
-        bufferSize,
+        sizeToKib(bufferSize),
         static_cast<size_t>(
-            std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime).count()
+            std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime).count()
         ),
     };
 }
@@ -111,7 +113,7 @@ size_t Experiment::iterationAmount = 1000;
 
 Experiment::BufferPtr Experiment::createFilledBuffer(size_t size)
 {
-    auto buffer = BufferPtr(new uint8_t[size]);
+    auto buffer = BufferPtr(new AtomicType[size]);
     Random random;
 
     for (size_t i = 0; i < size; i++) {
@@ -119,6 +121,16 @@ Experiment::BufferPtr Experiment::createFilledBuffer(size_t size)
     }
 
     return buffer;
+}
+
+size_t Experiment::kibToSize(size_t kib)
+{
+    return kib * 1024 / sizeof(AtomicType);
+}
+
+size_t Experiment::sizeToKib(size_t size)
+{
+    return size * sizeof(AtomicType) / 1024;
 }
 
 Investigation Investigation::doInvestigation(Direction direction, const std::vector<size_t> &bufferSizes)
