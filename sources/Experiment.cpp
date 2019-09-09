@@ -5,6 +5,28 @@
 #include <chrono>
 #include <iostream>
 
+#define BURN_CACHE uint8_t value = 0; \
+    for (size_t i = 0; i < bufferSize; i++) { \
+       value = buffer[i]; \
+    }
+
+#define WALK_FORWARD \
+    for (size_t i = 0; i < bufferSize; i++) { \
+        value = buffer[i]; \
+    }
+
+#define WALK_BACKWARD \
+    for (size_t i = 0; i < bufferSize; i++) { \
+        value = buffer[bufferSize - i - 1]; \
+    }
+
+#define WALK_RANDOM \
+    for (size_t i = 0; i < bufferSize; i++) { \
+        value = buffer[random.generateSize(bufferSize)]; \
+    }
+
+#define VALUE_USEFUL \
+buffer[0] = value;
 
 uint8_t Random::generateByte() const
 {
@@ -25,26 +47,47 @@ Random::Random()
     Random::generator = std::mt19937{std::random_device{}()};
 }
 
-Experiment Experiment::doExperiment(size_t bufferSize, const Experiment::WalkFunctionType &walkFunction)
+Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction direction)
 {
     std::cout << "Experiment. Size: " << bufferSize << std::endl;
 
-    auto buffer = createFilledBuffer(bufferSize);       // Инициализация
-
-    // Прогрев кэша
-    uint8_t value = 0;
-    for (size_t i = 0; i < bufferSize; i++) {
-        value = buffer[i];
-    }
+    // Инициализация
+    class Random random;
+    std::chrono::system_clock::time_point startTime, stopTime;
+    auto buffer = createFilledBuffer(bufferSize);
 
     // Выполнение
-    auto startTime = std::chrono::high_resolution_clock::now();
-    for (size_t i = 0; i < iterationAmount; i++) {
-        walkFunction(buffer, bufferSize);
-    }
-    auto stopTime = std::chrono::high_resolution_clock::now();
+    if (direction == Investigation::Forward) {
+        BURN_CACHE
+        startTime = std::chrono::high_resolution_clock::now();
 
-    buffer[0] = value;        // Remove unused variable warning
+        for (size_t k = 0; k < iterationAmount; k++) {
+            WALK_FORWARD
+        }
+
+        stopTime = std::chrono::high_resolution_clock::now();
+        VALUE_USEFUL
+    } else if (direction == Investigation::Backward) {
+        BURN_CACHE
+        startTime = std::chrono::high_resolution_clock::now();
+
+        for (size_t k = 0; k < iterationAmount; k++) {
+            WALK_BACKWARD
+        }
+
+        stopTime = std::chrono::high_resolution_clock::now();
+        VALUE_USEFUL
+    } else {
+        BURN_CACHE
+        startTime = std::chrono::high_resolution_clock::now();
+
+        for (size_t k = 0; k < iterationAmount; k++) {
+            WALK_RANDOM
+        }
+
+        stopTime = std::chrono::high_resolution_clock::now();
+        VALUE_USEFUL
+    }
 
     // Возврат результата
     return {
@@ -77,7 +120,7 @@ Investigation Investigation::doInvestigation(Direction direction, const std::vec
 
     for (size_t size: bufferSizes) {
         experiments.emplace_back(
-            Experiment::doExperiment(size, getDirectionFunction(direction))
+            Experiment::doExperiment(size, direction)
         );
     }
 
@@ -85,49 +128,6 @@ Investigation Investigation::doInvestigation(Direction direction, const std::vec
         direction,
         std::move(experiments),
     };
-}
-
-uint8_t Investigation::walkForward(const Experiment::BufferPtr &buffer, size_t size)
-{
-    uint8_t value = 0;
-    for (size_t i = 0; i < size; i++) {
-        value = buffer[i];
-    }
-
-    return value;
-}
-
-uint8_t Investigation::walkBackward(const Experiment::BufferPtr &buffer, size_t size)
-{
-    uint8_t value = 0;
-    for (size_t i = 0; i < size; i++) {
-        value = buffer[size - i - 1];
-    }
-
-    return value;
-}
-
-uint8_t Investigation::walkRandom(const Experiment::BufferPtr &buffer, size_t size)
-{
-    class Random random;
-
-    uint8_t value = 0;
-    for (size_t i = 0; i < size; i++) {
-        value = buffer[random.generateSize(size)];
-    }
-
-    return value;
-}
-
-Experiment::WalkFunctionType Investigation::getDirectionFunction(Direction direction)
-{
-    if (direction == Forward) {
-        return &Investigation::walkForward;
-    }
-    if (direction == Backward) {
-        return &Investigation::walkBackward;
-    }
-    return &Investigation::walkRandom;
 }
 
 ExperimentInitData ExperimentInitData::getExperimentData(const HardwareData &hardware)

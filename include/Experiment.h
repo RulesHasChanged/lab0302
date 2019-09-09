@@ -17,21 +17,7 @@ private:
     static std::mt19937 generator;
 };
 
-struct Experiment
-{
-    using BufferPtr = std::shared_ptr<uint8_t[]>;
-    using WalkFunctionType = std::function<uint8_t(BufferPtr, size_t)>;
-
-    size_t bufferSize;
-    size_t duration;
-
-    static Experiment doExperiment(size_t bufferSize, const WalkFunctionType &walkFunction);
-
-    static size_t iterationAmount;
-
-private:
-    static BufferPtr createFilledBuffer(size_t size);
-};
+struct Experiment;
 
 struct Investigation
 {
@@ -47,12 +33,22 @@ struct Investigation
     std::vector<Experiment> experiments;
 
     static Investigation doInvestigation(Direction direction, const std::vector<size_t>& bufferSizes);
+};
 
-    static uint8_t walkForward(const Experiment::BufferPtr &buffer, size_t size);
-    static uint8_t walkBackward(const Experiment::BufferPtr & buffer, size_t size);
-    static uint8_t walkRandom(const Experiment::BufferPtr & buffer, size_t size);
+struct Experiment
+{
+    using BufferPtr = std::shared_ptr<uint8_t[]>;
+    using WalkFunctionType = std::function<uint8_t(BufferPtr, size_t)>;
 
-    static Experiment::WalkFunctionType getDirectionFunction(Direction direction);
+    size_t bufferSize;
+    size_t duration;
+
+    static Experiment doExperiment(size_t bufferSize, Investigation::Direction direction);
+
+    static size_t iterationAmount;
+
+private:
+    static BufferPtr createFilledBuffer(size_t size);
 };
 
 struct ExperimentData
