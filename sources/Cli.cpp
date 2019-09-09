@@ -44,7 +44,7 @@ std::string experimentDataToHtmlString(const ExperimentData &data)
         <head>
           <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
-              google.charts.load('current', {'packages':['line']});
+              google.charts.load('current', {'packages':['corechart']});
               google.charts.setOnLoadCallback(drawChart);
 
             function drawChart() {
@@ -107,13 +107,18 @@ std::string experimentDataToHtmlString(const ExperimentData &data)
                   title: 'Time, microseconds',
                   logScale: false
                 },
-                width: 900,
-                height: 500,
+                explorer: {
+                  axis: 'horizontal',
+                  keepInBounds: true,
+                  maxZoomIn: 8.0,
+                },
+                width: 1200,
+                height: 800,
               };
 
-              var chart = new google.charts.Line(document.getElementById('line_top_x'));
+              var chart = new google.visualization.LineChart(document.getElementById('line_top_x'));
 
-              chart.draw(data, google.charts.Line.convertOptions(options));
+              chart.draw(data, options);
             }
           </script>
         </head>

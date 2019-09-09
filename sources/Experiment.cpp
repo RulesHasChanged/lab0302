@@ -10,6 +10,14 @@
        value = buffer[i]; \
     }
 
+#define RANDOM_PREGEN \
+    std::vector<size_t> indexes(bufferSize * iterationAmount); \
+    for (size_t k = 0; k < iterationAmount; k++) { \
+        for (size_t i = 0; i < bufferSize; i++) { \
+            indexes[i + bufferSize * k] = random.generateSize(bufferSize); \
+        } \
+    }
+
 #define WALK_FORWARD \
     for (size_t i = 0; i < bufferSize; i++) { \
         value = buffer[i]; \
@@ -22,7 +30,7 @@
 
 #define WALK_RANDOM \
     for (size_t i = 0; i < bufferSize; i++) { \
-        value = buffer[random.generateSize(bufferSize)]; \
+        value = buffer[indexes[i + k * bufferSize]]; \
     }
 
 #define VALUE_USEFUL \
@@ -78,6 +86,7 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
         stopTime = std::chrono::high_resolution_clock::now();
         VALUE_USEFUL
     } else {
+        RANDOM_PREGEN
         BURN_CACHE
         startTime = std::chrono::high_resolution_clock::now();
 
