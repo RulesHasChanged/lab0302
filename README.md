@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.com/Toliak/lab0303.svg?branch=master)](https://travis-ci.com/Toliak/lab0302)
+![Code size](https://img.shields.io/github/languages/code-size/Toliak/lab0302.svg)
+![GitHub Repo size](https://img.shields.io/github/repo-size/Toliak/lab0302.svg)
+![Some badge](https://img.shields.io/badge/toliak-purple-purple.svg)
+![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)
+
 # Лабораторная работа №2
 
 > Кэш - промежуточный буфер с быстрым доступом, содержащий информацию, которая может быть запрошена с наибольшей вероятностью. Доступ к данным в кэше осуществляется быстрее, чем выборка исходных данных из более медленной памяти или удаленного источника, однако её объём существенно ограничен по сравнению с хранилищем исходных данных.
