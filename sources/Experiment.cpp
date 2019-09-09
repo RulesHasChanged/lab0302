@@ -44,7 +44,7 @@ Experiment Experiment::doExperiment(size_t bufferSize, const Experiment::WalkFun
     }
     auto stopTime = std::chrono::high_resolution_clock::now();
 
-    bufferSize -= value;        // Remove unused variable warning
+    buffer[0] = value;        // Remove unused variable warning
 
     // Возврат результата
     return {
