@@ -11,12 +11,10 @@
     }
 
 #define RANDOM_PREGEN \
-    std::vector<size_t> indexes(bufferSize * iterationAmount); \
-    for (size_t k = 0; k < iterationAmount; k++) { \
-        for (size_t i = 0; i < bufferSize; i++) { \
-            indexes[i + bufferSize * k] = random.generateSize(bufferSize); \
-        } \
-    }
+    std::vector<size_t> indexes(bufferSize); \
+    for (size_t i = 0; i < bufferSize; i++) { \
+        indexes[i] = random.generateSize(bufferSize); \
+    } \
 
 #define WALK_FORWARD \
     for (size_t i = 0; i < bufferSize; i++) { \
@@ -30,7 +28,7 @@
 
 #define WALK_RANDOM \
     for (size_t i = 0; i < bufferSize; i++) { \
-        value = buffer[indexes[i + k * bufferSize]]; \
+        value = buffer[indexes[i]]; \
     }
 
 #define VALUE_USEFUL \
