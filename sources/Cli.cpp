@@ -40,7 +40,7 @@ std::string experimentDataToYamlString(const ExperimentData &data)
 
 std::string experimentDataToHtmlString(const ExperimentData &data)
 {
-    std::string result = R"(<html>
+    std::string result = R"(data:text/html,<html>
         <head>
           <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
