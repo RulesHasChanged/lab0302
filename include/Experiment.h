@@ -4,6 +4,7 @@
 #include <memory>
 #include <random>
 #include <functional>
+#include <chrono>
 
 class Random
 {
@@ -46,10 +47,12 @@ struct Experiment
 
     static Experiment doExperiment(size_t bufferSize, Investigation::Direction direction);
 
-    static size_t iterationAmount;
+    static void run(const BufferPtr &buffer, const std::vector<size_t> &indexes);
+
     static size_t kibToSize(size_t kib);
     static size_t sizeToKib(size_t size);
 
+    static const size_t iterationAmount;
 private:
     static BufferPtr createFilledBuffer(size_t size);
 };

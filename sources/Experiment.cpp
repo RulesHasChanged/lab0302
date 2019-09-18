@@ -4,35 +4,7 @@
 #include <cmath>
 #include <chrono>
 #include <iostream>
-
-#define BURN_CACHE uint8_t value = 0; \
-    for (size_t i = 0; i < bufferSize; i++) { \
-       value = buffer[i]; \
-    }
-
-#define RANDOM_PREGEN \
-    std::vector<size_t> indexes(bufferSize); \
-    for (size_t i = 0; i < bufferSize; i++) { \
-        indexes[i] = random.generateSize(bufferSize); \
-    } \
-
-#define WALK_FORWARD \
-    for (size_t i = 0; i < bufferSize; i++) { \
-        value = buffer[i]; \
-    }
-
-#define WALK_BACKWARD \
-    for (size_t i = 0; i < bufferSize; i++) { \
-        value = buffer[bufferSize - i - 1]; \
-    }
-
-#define WALK_RANDOM \
-    for (size_t i = 0; i < bufferSize; i++) { \
-        value = buffer[indexes[i]]; \
-    }
-
-#define VALUE_USEFUL \
-buffer[0] = value;
+#include <random>
 
 uint8_t Random::generateByte() const
 {
@@ -64,39 +36,46 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
     std::chrono::system_clock::time_point startTime, stopTime;
     auto buffer = createFilledBuffer(bufferSize);
 
+    std::vector<size_t> indexes(bufferSize);
+    std::iota(indexes.begin(), indexes.end(), 0);
+
+    static const std::unordered_map<
+        Investigation::Direction,
+        std::function<void()>
+    > runners = {
+        {
+            Investigation::Forward,
+            [&buffer, &indexes]()
+            {
+                return run(buffer, indexes);
+            }
+        },
+        {
+            Investigation::Backward,
+            [&buffer, &indexes]()
+            {
+                std::reverse(indexes.begin(), indexes.end());
+
+                return run(buffer, indexes);
+            }
+        },
+        {
+            Investigation::Random,
+            [&buffer, &indexes]()
+            {
+                std::shuffle(indexes.begin(), indexes.end(), std::mt19937{std::random_device{}()});
+
+                return run(buffer, indexes);
+            }
+        },
+    };
+
     // Выполнение
-    if (direction == Investigation::Forward) {
-        BURN_CACHE
-        startTime = std::chrono::high_resolution_clock::now();
-
-        for (size_t k = 0; k < iterationAmount; k++) {
-            WALK_FORWARD
-        }
-
-        stopTime = std::chrono::high_resolution_clock::now();
-        VALUE_USEFUL
-    } else if (direction == Investigation::Backward) {
-        BURN_CACHE
-        startTime = std::chrono::high_resolution_clock::now();
-
-        for (size_t k = 0; k < iterationAmount; k++) {
-            WALK_BACKWARD
-        }
-
-        stopTime = std::chrono::high_resolution_clock::now();
-        VALUE_USEFUL
-    } else {
-        RANDOM_PREGEN
-        BURN_CACHE
-        startTime = std::chrono::high_resolution_clock::now();
-
-        for (size_t k = 0; k < iterationAmount; k++) {
-            WALK_RANDOM
-        }
-
-        stopTime = std::chrono::high_resolution_clock::now();
-        VALUE_USEFUL
+    startTime = std::chrono::high_resolution_clock::now();
+    for (size_t k = 0; k < iterationAmount; k++) {
+        runners.at(direction)();
     }
+    stopTime = std::chrono::high_resolution_clock::now();
 
     // Возврат результата
     return {
@@ -107,7 +86,17 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
     };
 }
 
-size_t Experiment::iterationAmount = 1000;
+void Experiment::run(const BufferPtr &buffer, const std::vector<size_t> &indexes)
+{
+    AtomicType value = 0;
+
+    for (size_t index : indexes) {
+        value = buffer[index];
+    }
+    buffer[0] = value;          // Чтобы компилятор не ругался
+}
+
+const size_t Experiment::iterationAmount = 1000;
 
 Experiment::BufferPtr Experiment::createFilledBuffer(size_t size)
 {
