@@ -6,18 +6,6 @@
 #include <functional>
 #include <chrono>
 
-class Random
-{
-public:
-    Random();
-
-    [[nodiscard]] uint8_t generateByte() const;
-    [[nodiscard]] size_t generateSize(size_t end) const;
-
-private:
-    static std::mt19937 generator;
-};
-
 struct Experiment;
 
 struct Investigation
@@ -46,6 +34,10 @@ struct Experiment
     size_t duration;
 
     static Experiment doExperiment(size_t bufferSize, Investigation::Direction direction);
+
+    static void runForward(const BufferPtr &buffer, std::vector<size_t> &indexes);
+    static void runBackward(const BufferPtr &buffer, std::vector<size_t> &indexes);
+    static void runRandom(const BufferPtr &buffer, std::vector<size_t> &indexes);
 
     static void run(const BufferPtr &buffer, const std::vector<size_t> &indexes);
 

@@ -6,25 +6,6 @@
 #include <iostream>
 #include <random>
 
-uint8_t Random::generateByte() const
-{
-    std::uniform_int_distribution<> converter(0, 128);
-    return converter(generator);
-}
-
-size_t Random::generateSize(size_t end) const
-{
-    std::uniform_int_distribution<> converter(0, end);
-    return converter(generator);
-}
-
-std::mt19937 Random::generator{std::random_device{}()};
-
-Random::Random()
-{
-    Random::generator = std::mt19937{std::random_device{}()};
-}
-
 Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction direction)
 {
     std::cout << "Experiment. Size (KiB): " << bufferSize
@@ -32,7 +13,6 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
     bufferSize = kibToSize(bufferSize);
 
     // Инициализация
-    class Random random;
     std::chrono::system_clock::time_point startTime, stopTime;
     auto buffer = createFilledBuffer(bufferSize);
 
@@ -41,39 +21,17 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
 
     static const std::unordered_map<
         Investigation::Direction,
-        std::function<void()>
+        void (*)(const BufferPtr &, std::vector<size_t> &)
     > runners = {
-        {
-            Investigation::Forward,
-            [&buffer, &indexes]()
-            {
-                return run(buffer, indexes);
-            }
-        },
-        {
-            Investigation::Backward,
-            [&buffer, &indexes]()
-            {
-                std::reverse(indexes.begin(), indexes.end());
-
-                return run(buffer, indexes);
-            }
-        },
-        {
-            Investigation::Random,
-            [&buffer, &indexes]()
-            {
-                std::shuffle(indexes.begin(), indexes.end(), std::mt19937{std::random_device{}()});
-
-                return run(buffer, indexes);
-            }
-        },
+        {Investigation::Forward, &Experiment::runForward},
+        {Investigation::Backward, &Experiment::runBackward},
+        {Investigation::Random, &Experiment::runRandom},
     };
 
     // Выполнение
     startTime = std::chrono::high_resolution_clock::now();
     for (size_t k = 0; k < iterationAmount; k++) {
-        runners.at(direction)();
+        runners.at(direction)(buffer, indexes);
     }
     stopTime = std::chrono::high_resolution_clock::now();
 
@@ -84,6 +42,25 @@ Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction 
             std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime).count()
         ),
     };
+}
+
+void Experiment::runForward(const Experiment::BufferPtr &buffer, std::vector<size_t> &indexes)
+{
+    return run(buffer, indexes);
+}
+
+void Experiment::runBackward(const Experiment::BufferPtr &buffer, std::vector<size_t> &indexes)
+{
+    std::reverse(indexes.begin(), indexes.end());
+
+    return run(buffer, indexes);
+}
+
+void Experiment::runRandom(const Experiment::BufferPtr &buffer, std::vector<size_t> &indexes)
+{
+    std::shuffle(indexes.begin(), indexes.end(), std::mt19937{std::random_device{}()});
+
+    return run(buffer, indexes);
 }
 
 void Experiment::run(const BufferPtr &buffer, const std::vector<size_t> &indexes)
@@ -101,10 +78,10 @@ const size_t Experiment::iterationAmount = 1000;
 Experiment::BufferPtr Experiment::createFilledBuffer(size_t size)
 {
     auto buffer = BufferPtr(new AtomicType[size]);
-    Random random;
+    auto random = std::mt19937{std::random_device{}()};
 
     for (size_t i = 0; i < size; i++) {
-        buffer[i] = random.generateByte();
+        buffer[i] = random();
     }
 
     return buffer;
