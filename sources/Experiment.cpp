@@ -6,6 +6,8 @@
 #include <iostream>
 #include <random>
 
+using BufferType = ExperimentInitData::BufferType;
+
 Experiment Experiment::doExperiment(size_t bufferSize, Investigation::Direction direction)
 {
     std::cout << "Experiment. Size (KiB): " << bufferSize
@@ -97,7 +99,7 @@ size_t Experiment::sizeToKib(size_t size)
     return size * sizeof(AtomicType) / 1024;
 }
 
-Investigation Investigation::doInvestigation(Direction direction, const std::vector<size_t> &bufferSizes)
+Investigation Investigation::doInvestigation(Direction direction, const BufferType &bufferSizes)
 {
     std::cout << "Investigation. Direction: " << Cli::directionToString(direction) << std::endl;
 
@@ -123,14 +125,13 @@ ExperimentInitData ExperimentInitData::getExperimentData(const HardwareData &har
     size_t startPower = ceil(log2(startValue));
     size_t stopPower = floor(log2(stopValue));
 
-    std::vector<size_t> resultBufferSizes;
-    resultBufferSizes.reserve(2 + (stopPower - startPower + 1));                // borders + powers
+    BufferType resultBufferSizes;
 
-    resultBufferSizes.push_back(startValue);
+    resultBufferSizes.insert(startValue);
     for (size_t power = startPower; power <= stopPower; power++) {
-        resultBufferSizes.push_back(1u << power);
+        resultBufferSizes.insert(1u << power);
     }
-    resultBufferSizes.push_back(stopValue);
+    resultBufferSizes.insert(stopValue);
 
     return {
         std::move(resultBufferSizes),

@@ -5,8 +5,19 @@
 #include <random>
 #include <functional>
 #include <chrono>
+#include <set>
 
 struct Experiment;
+
+struct ExperimentInitData
+{
+    using BufferType = std::set<size_t>;
+
+    static ExperimentInitData getExperimentData(const struct HardwareData &hardware);
+
+    BufferType bufferSizes;
+};
+
 
 struct Investigation
 {
@@ -21,7 +32,7 @@ struct Investigation
 
     std::vector<Experiment> experiments;
 
-    static Investigation doInvestigation(Direction direction, const std::vector<size_t>& bufferSizes);
+    static Investigation doInvestigation(Direction direction, const ExperimentInitData::BufferType& bufferSizes);
 };
 
 struct Experiment
@@ -53,12 +64,4 @@ struct ExperimentData
 {
     std::vector<Investigation> investigations;
 };
-
-struct ExperimentInitData
-{
-    static ExperimentInitData getExperimentData(const struct HardwareData &hardware);
-
-    std::vector<size_t> bufferSizes;
-};
-
 
