@@ -20,17 +20,19 @@ std::string experimentDataToYamlString(const ExperimentData &data)
     std::string result;
 
     for (const Investigation &investigation: data.investigations) {
-        result += "investigation:\n  travel_variant: ";
-        result += directionToString(investigation.direction) + "\n";
-        result += "  experiments:\n  - experiment:\n";
+        result += "- investigation:\n  travel_variant: \"";
+        result += directionToString(investigation.direction) + "\"\n";
+        result += "  experiments:\n";
 
         for (size_t i = 0; i < investigation.experiments.size(); i++) {
             const auto &experiment = investigation.experiments[i];
 
-            result += "      number: " + std::to_string(i) + "\n";
-            result += "      input_data:\n        buffer_size: \"" + std::to_string(experiment.bufferSize) + " KiB\"\n";
-            result +=
-                "      results:\n        duration: \"" + std::to_string(experiment.duration) + " milliseconds\"\n";
+            result += "  - experiment:\n"
+                      "      number: " + std::to_string(i)
+                + "\n      input_data:\n        buffer_size: \""
+                + std::to_string(experiment.bufferSize)
+                + " KiB\"\n      results:\n        duration: \""
+                + std::to_string(experiment.duration) + " milliseconds\"\n";
         }
         result += "\n";
     }
@@ -81,15 +83,15 @@ std::string experimentDataToHtmlString(const ExperimentData &data)
     }
 
     result += "\ndata.addRows([\n";
-        for (size_t i = 0; i < bufferSizes.size(); i++) {
-            result += "[" + std::to_string(bufferSizes[i]) + ", ";
+    for (size_t i = 0; i < bufferSizes.size(); i++) {
+        result += "[" + std::to_string(bufferSizes[i]) + ", ";
 
-            for (size_t value : rows[i]) {
-                result += std::to_string(value) + ", ";
-            }
-
-            result += "],\n";
+        for (size_t value : rows[i]) {
+            result += std::to_string(value) + ", ";
         }
+
+        result += "],\n";
+    }
     result += "]);\n";
 
 
