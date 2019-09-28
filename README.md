@@ -92,6 +92,10 @@ cache_size['3'] = 8 mb;
 [Отчет](reports/report_1_i7_9750h.yml), 
 [График](https://jsfiddle.net/xfvz3k89/)
 
+Эксперимент 2:
+[Отчет](reports/report_1_i7_9750h.yml), 
+[График](https://jsfiddle.net/4tf7Lhuj/)
+
 #### Intel Core i7-7700HQ
 
 Эксперимент 1:
