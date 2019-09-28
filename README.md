@@ -64,7 +64,7 @@ cache_size['3'] = 8 mb;
 Ниже представлен формат и пример отчета:
 
 ```yaml
-investigation:                                       |  investigaion:
+- investigation:                                     |  - investigaion:
   travel_variant: <вариант_прохода>                  |    travel_order: "direction"
   experiments:                                       |    experiments:
   - experiment:                                      |    - experiment:
@@ -80,7 +80,7 @@ investigation:                                       |  investigaion:
       results:                                       |        results:
         duration: <продолжительность>                |          duration: "2ns"
                                                      |
-investigation:                                       |  investigation:
+- investigation:                                     |  - investigation:
 ...                                                  |  ...
 ```
 
@@ -88,5 +88,12 @@ investigation:                                       |  investigation:
 
 #### Intel Core i7-9750H
 
-Эксперимент 1: [Отчет](reports/report_1_i7_9750h.yaml), 
+Эксперимент 1:
+[Отчет](reports/report_1_i7_9750h.yaml), 
 [График](https://jsfiddle.net/xfvz3k89/)
+
+#### Intel Core i7-7700HQ
+
+Эксперимент 1:
+[Отчет](reports/report_1_i7_7700hq.yaml), 
+[График](https://jsfiddle.net/v36n2zja/)
