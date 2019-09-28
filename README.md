@@ -89,11 +89,15 @@ cache_size['3'] = 8 mb;
 #### Intel Core i7-9750H
 
 Эксперимент 1:
-[Отчет](reports/report_1_i7_9750h.yaml), 
+[Отчет](reports/report_1_i7_9750h.yml), 
 [График](https://jsfiddle.net/xfvz3k89/)
 
 #### Intel Core i7-7700HQ
 
 Эксперимент 1:
-[Отчет](reports/report_1_i7_7700hq.yaml), 
+[Отчет](reports/report_1_i7_7700hq.yml), 
 [График](https://jsfiddle.net/v36n2zja/)
+
+Эксперимент 2:
+[Отчет](reports/report_2_i7_7700hq.yml), 
+[График](https://jsfiddle.net/qsuLkp4v/)
